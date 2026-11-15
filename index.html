@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta name="theme-color" content="#7c5cd6">
 <title>K_Film</title>
 <style>
@@ -77,6 +78,14 @@ label{display:block;font-size:13px;color:var(--mut);margin:12px 0 5px}
 .hbar span{width:92px;font-size:12px;color:var(--mut)}
 .hbar .bar{flex:1;margin:0}
 .hbar em{font-style:normal;font-size:12px;width:24px}
+button{touch-action:manipulation}
+.btn,.chip,nav button,.fav{transition:transform .08s,opacity .08s}
+.btn:active,.chip:active,nav button:active,.fav:active{transform:scale(.93);opacity:.75}
+.dmsg{position:sticky;top:0;z-index:3;border-radius:12px;font-weight:700;text-align:center;margin-bottom:8px}
+.dmsg:empty{display:none}
+.dmsg.ok{background:#2e9e6b;color:#fff;padding:11px}
+.dmsg.bad{background:#c2415d;color:#fff;padding:11px}
+.ver{text-align:center;font-size:11px;color:var(--mut);margin-top:12px}
 </style>
 </head>
 <body>
@@ -108,21 +117,22 @@ label{display:block;font-size:13px;color:var(--mut);margin:12px 0 5px}
 "use strict";
 /* ---------- i18n ---------- */
 const L={
-fa:{home:"خانه",search:"جستجو",lib:"کتابخانه من",favs:"علاقه‌مندی‌ها",stats:"آمار",settings:"تنظیمات",cont:"ادامه تماشا",recent:"تازه اضافه‌شده",favorites:"علاقه‌مندی‌ها",rec:"پیشنهاد از کتابخانه شما",ph:"نام فیلم یا سریال...",go:"جستجو",movies:"فیلم‌ها",tv:"سریال‌ها",add:"افزودن",added:"اضافه شد",inlib:"در کتابخانه",watching:"در حال تماشا",watched:"دیده‌شده",plan:"قصد تماشا",all:"همه",none:"بدون وضعیت",rating:"امتیاز من (۰ تا ۱۰)",notes:"یادداشت من",epw:"قسمت‌های دیده‌شده",total:"کل قسمت‌ها",rem:"باقی‌مانده",del:"حذف",save:"ذخیره",close:"بستن",orig:"عنوان اصلی",status:"وضعیت",empty:"اینجا هنوز چیزی نیست. از بخش جستجو شروع کنید.",nokey:"ابتدا کلید TMDB را در تنظیمات وارد کنید.",neterr:"اتصال به TMDB برقرار نشد. اینترنت یا کلید خود را بررسی کنید.",nores:"نتیجه‌ای پیدا نشد.",nameq:"نام شما چیست؟",start:"شروع",ep:"قسمت",lang:"زبان",theme:"تم",auto:"خودکار",light:"روشن",dark:"تاریک",name:"نام شما",key:"کلید TMDB (v3)",keyh:"کلید فقط روی همین دستگاه ذخیره می‌شود.",exp:"خروجی پشتیبان (JSON)",imp:"وارد کردن پشتیبان",acct:"حساب کاربری و همگام‌سازی ابری",acctn:"همگام‌سازی ابری هنوز در این نسخه فعال نیست. از پشتیبان JSON استفاده کنید.",about:"درباره",tw:"فیلم دیده‌شده",tvw:"سریال دیده‌شده",tt:"کل عنوان‌ها",epst:"کل قسمت‌های دیده‌شده",avg:"میانگین امتیاز",delq:"این عنوان حذف شود؟",impok:"پشتیبان وارد شد",imperr:"فایل پشتیبان معتبر نیست.",ovr:"عنوان‌های تکراری هستند. با تایید، جایگزین می‌شوند و با لغو، حفظ می‌شوند. جایگزین شوند؟",saved:"ذخیره شد",byst:"بر اساس وضعیت",nm:"سال",unk:"نامشخص",wm:n=>n?`خوش برگشتی، ${n}! 🎬`:"",ct:"کشور"},
-en:{home:"Home",search:"Search",lib:"My Library",favs:"Favorites",stats:"Statistics",settings:"Settings",cont:"Continue Watching",recent:"Recently Added",favorites:"Favorites",rec:"Browse your library",ph:"Movie or series title...",go:"Search",movies:"Movies",tv:"TV Series",add:"Add",added:"Added",inlib:"In library",watching:"Currently Watching",watched:"Watched",plan:"Plan to Watch",all:"All",none:"No status",rating:"My rating (0–10)",notes:"My notes",epw:"Episodes watched",total:"Total episodes",rem:"Remaining",del:"Delete",save:"Save",close:"Close",orig:"Original title",status:"Status",empty:"Nothing here yet. Start from Search.",nokey:"Enter your TMDB key in Settings first.",neterr:"Could not reach TMDB. Check your internet connection or your key.",nores:"No results found.",nameq:"What is your name?",start:"Start",ep:"episodes",lang:"Language",theme:"Theme",auto:"Auto",light:"Light",dark:"Dark",name:"Your name",key:"TMDB key (v3)",keyh:"The key is stored only on this device.",exp:"Export backup (JSON)",imp:"Import backup",acct:"Account & cloud sync",acctn:"Cloud sync is not active in this version. Use the JSON backup.",about:"About",tw:"Movies watched",tvw:"Series watched",tt:"Titles in library",epst:"Episodes watched",avg:"Average rating",delq:"Delete this title?",impok:"Backup imported",imperr:"This backup file is not valid.",ovr:"Some titles already exist. OK replaces them, Cancel keeps yours. Replace?",saved:"Saved",byst:"By status",nm:"Year",unk:"Unknown",wm:n=>"",ct:"Country"},
-ko:{home:"홈",search:"검색",lib:"내 라이브러리",favs:"즐겨찾기",stats:"통계",settings:"설정",cont:"시청 중",recent:"최근 추가",favorites:"즐겨찾기",rec:"라이브러리 둘러보기",ph:"영화 또는 시리즈 제목...",go:"검색",movies:"영화",tv:"TV 시리즈",add:"추가",added:"추가됨",inlib:"라이브러리에 있음",watching:"시청 중",watched:"시청 완료",plan:"볼 예정",all:"전체",none:"상태 없음",rating:"내 평점 (0–10)",notes:"내 메모",epw:"시청한 에피소드",total:"전체 에피소드",rem:"남은 에피소드",del:"삭제",save:"저장",close:"닫기",orig:"원제",status:"상태",empty:"아직 아무것도 없습니다. 검색에서 시작하세요.",nokey:"먼저 설정에서 TMDB 키를 입력하세요.",neterr:"TMDB에 연결할 수 없습니다. 인터넷 또는 키를 확인하세요.",nores:"검색 결과가 없습니다.",nameq:"이름이 무엇인가요?",start:"시작",ep:"부작",lang:"언어",theme:"테마",auto:"자동",light:"라이트",dark:"다크",name:"이름",key:"TMDB 키 (v3)",keyh:"키는 이 기기에만 저장됩니다.",exp:"백업 내보내기 (JSON)",imp:"백업 가져오기",acct:"계정 및 클라우드 동기화",acctn:"이 버전에서는 클라우드 동기화가 아직 작동하지 않습니다. JSON 백업을 사용하세요.",about:"정보",tw:"시청한 영화",tvw:"시청한 시리즈",tt:"라이브러리 항목",epst:"시청한 에피소드",avg:"평균 평점",delq:"이 항목을 삭제할까요?",impok:"백업을 가져왔습니다",imperr:"유효하지 않은 백업 파일입니다.",ovr:"이미 있는 항목이 있습니다. 확인하면 덮어쓰고, 취소하면 기존 항목을 유지합니다. 덮어쓸까요?",saved:"저장됨",byst:"상태별",nm:"연도",unk:"알 수 없음",wm:n=>"",ct:"국가"}
+fa:{home:"خانه",search:"جستجو",lib:"کتابخانه من",favs:"علاقه‌مندی‌ها",stats:"آمار",settings:"تنظیمات",cont:"ادامه تماشا",recent:"تازه اضافه‌شده",favorites:"علاقه‌مندی‌ها",rec:"پیشنهاد از کتابخانه شما",ph:"نام فیلم یا سریال...",go:"جستجو",movies:"فیلم‌ها",tv:"سریال‌ها",add:"افزودن",added:"اضافه شد",inlib:"در کتابخانه",watching:"در حال تماشا",watched:"دیده‌شده",plan:"قصد تماشا",all:"همه",none:"بدون وضعیت",rating:"امتیاز من (۰ تا ۱۰)",notes:"یادداشت من",epw:"قسمت‌های دیده‌شده",total:"کل قسمت‌ها",rem:"باقی‌مانده",del:"حذف",save:"ذخیره",close:"بستن",orig:"عنوان اصلی",status:"وضعیت",empty:"اینجا هنوز چیزی نیست. از بخش جستجو شروع کنید.",nokey:"ابتدا کلید TMDB را در تنظیمات وارد کنید.",neterr:"اتصال به TMDB برقرار نشد. اینترنت یا کلید خود را بررسی کنید.",nores:"نتیجه‌ای پیدا نشد.",nameq:"نام شما چیست؟",start:"شروع",ep:"قسمت",lang:"زبان",theme:"تم",auto:"خودکار",light:"روشن",dark:"تاریک",name:"نام شما",key:"کلید TMDB (v3)",keyh:"کلید فقط روی همین دستگاه ذخیره می‌شود.",exp:"خروجی پشتیبان (JSON)",imp:"وارد کردن پشتیبان",acct:"حساب کاربری و همگام‌سازی ابری",acctn:"همگام‌سازی ابری هنوز در این نسخه فعال نیست. از پشتیبان JSON استفاده کنید.",about:"درباره",tw:"فیلم دیده‌شده",tvw:"سریال دیده‌شده",tt:"کل عنوان‌ها",epst:"کل قسمت‌های دیده‌شده",avg:"میانگین امتیاز",delq:"این عنوان حذف شود؟",impok:"پشتیبان وارد شد",imperr:"فایل پشتیبان معتبر نیست.",ovr:"عنوان‌های تکراری هستند. با تایید، جایگزین می‌شوند و با لغو، حفظ می‌شوند. جایگزین شوند؟",saved:"ذخیره شد ✓",saveerr:"ذخیره‌سازی انجام نشد. حافظه دستگاه پر یا مسدود است.",badr:"امتیاز باید عددی بین ۰ تا ۱۰ باشد.",bade:"تعداد قسمت باید یک عدد صحیح باشد.",byst:"بر اساس وضعیت",nm:"سال",unk:"نامشخص",wm:n=>n?`خوش برگشتی، ${n}! 🎬`:"",ct:"کشور"},
+en:{home:"Home",search:"Search",lib:"My Library",favs:"Favorites",stats:"Statistics",settings:"Settings",cont:"Continue Watching",recent:"Recently Added",favorites:"Favorites",rec:"Browse your library",ph:"Movie or series title...",go:"Search",movies:"Movies",tv:"TV Series",add:"Add",added:"Added",inlib:"In library",watching:"Currently Watching",watched:"Watched",plan:"Plan to Watch",all:"All",none:"No status",rating:"My rating (0–10)",notes:"My notes",epw:"Episodes watched",total:"Total episodes",rem:"Remaining",del:"Delete",save:"Save",close:"Close",orig:"Original title",status:"Status",empty:"Nothing here yet. Start from Search.",nokey:"Enter your TMDB key in Settings first.",neterr:"Could not reach TMDB. Check your internet connection or your key.",nores:"No results found.",nameq:"What is your name?",start:"Start",ep:"episodes",lang:"Language",theme:"Theme",auto:"Auto",light:"Light",dark:"Dark",name:"Your name",key:"TMDB key (v3)",keyh:"The key is stored only on this device.",exp:"Export backup (JSON)",imp:"Import backup",acct:"Account & cloud sync",acctn:"Cloud sync is not active in this version. Use the JSON backup.",about:"About",tw:"Movies watched",tvw:"Series watched",tt:"Titles in library",epst:"Episodes watched",avg:"Average rating",delq:"Delete this title?",impok:"Backup imported",imperr:"This backup file is not valid.",ovr:"Some titles already exist. OK replaces them, Cancel keeps yours. Replace?",saved:"Saved ✓",saveerr:"Could not save. Device storage is full or blocked.",badr:"Rating must be a number from 0 to 10.",bade:"Episodes must be a whole number.",byst:"By status",nm:"Year",unk:"Unknown",wm:n=>"",ct:"Country"},
+ko:{home:"홈",search:"검색",lib:"내 라이브러리",favs:"즐겨찾기",stats:"통계",settings:"설정",cont:"시청 중",recent:"최근 추가",favorites:"즐겨찾기",rec:"라이브러리 둘러보기",ph:"영화 또는 시리즈 제목...",go:"검색",movies:"영화",tv:"TV 시리즈",add:"추가",added:"추가됨",inlib:"라이브러리에 있음",watching:"시청 중",watched:"시청 완료",plan:"볼 예정",all:"전체",none:"상태 없음",rating:"내 평점 (0–10)",notes:"내 메모",epw:"시청한 에피소드",total:"전체 에피소드",rem:"남은 에피소드",del:"삭제",save:"저장",close:"닫기",orig:"원제",status:"상태",empty:"아직 아무것도 없습니다. 검색에서 시작하세요.",nokey:"먼저 설정에서 TMDB 키를 입력하세요.",neterr:"TMDB에 연결할 수 없습니다. 인터넷 또는 키를 확인하세요.",nores:"검색 결과가 없습니다.",nameq:"이름이 무엇인가요?",start:"시작",ep:"부작",lang:"언어",theme:"테마",auto:"자동",light:"라이트",dark:"다크",name:"이름",key:"TMDB 키 (v3)",keyh:"키는 이 기기에만 저장됩니다.",exp:"백업 내보내기 (JSON)",imp:"백업 가져오기",acct:"계정 및 클라우드 동기화",acctn:"이 버전에서는 클라우드 동기화가 아직 작동하지 않습니다. JSON 백업을 사용하세요.",about:"정보",tw:"시청한 영화",tvw:"시청한 시리즈",tt:"라이브러리 항목",epst:"시청한 에피소드",avg:"평균 평점",delq:"이 항목을 삭제할까요?",impok:"백업을 가져왔습니다",imperr:"유효하지 않은 백업 파일입니다.",ovr:"이미 있는 항목이 있습니다. 확인하면 덮어쓰고, 취소하면 기존 항목을 유지합니다. 덮어쓸까요?",saved:"저장됨 ✓",saveerr:"저장하지 못했습니다. 기기 저장 공간이 가득 찼거나 차단되었습니다.",badr:"평점은 0에서 10 사이의 숫자여야 합니다.",bade:"에피소드는 정수여야 합니다.",byst:"상태별",nm:"연도",unk:"알 수 없음",wm:n=>"",ct:"국가"}
 };
 const TL={fa:"fa-IR",en:"en-US",ko:"ko-KR"};
 /* ---------- state & storage ---------- */
 const KEY="kfilm.v1";
 let S={name:"",lang:"en",theme:"auto",key:"",lib:{},seen:false};
-try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+try{const r=localStorage.getItem(KEY);if(r){try{S=Object.assign(S,JSON.parse(r))}catch(e){localStorage.setItem(KEY+".corrupt",r)}}}catch(e){}
+try{navigator.storage?.persist?.()}catch(e){}
 let tab="home",libF="all",SR=null,sErr="",busy=false;
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("Storage error")}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){toast(t("saveerr"),true);return false}};
 const t=k=>L[S.lang][k]??L.en[k]??k;
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const $=s=>document.querySelector(s);
-function toast(m){const d=document.createElement("div");d.className="toast";d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
+function toast(m,bad){document.querySelectorAll(".toast").forEach(x=>x.remove());const d=document.createElement("div");d.className="toast";if(bad)d.style.background="#c2415d";d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),bad?3500:2200)}
 function applyTheme(){const dk=S.theme==="dark"||(S.theme==="auto"&&matchMedia("(prefers-color-scheme:dark)").matches);document.documentElement.dataset.t=dk?"dark":"light";document.documentElement.lang=S.lang;document.documentElement.dir=S.lang==="fa"?"rtl":"ltr"}
 matchMedia("(prefers-color-scheme:dark)").addEventListener?.("change",applyTheme);
 /* ---------- helpers ---------- */
@@ -209,7 +219,7 @@ function vSettings(){
   <label>${t("key")}</label><div class="sr"><input id="sk" type="password" autocomplete="off" value="${esc(S.key)}"><button class="btn" data-a="skey">${t("save")}</button></div><small style="color:var(--mut)">${t("keyh")}</small></div>
   <div class="box"><button class="btn" data-a="exp">${t("exp")}</button> <button class="btn ghost" data-a="imp">${t("imp")}</button><input id="imf" type="file" accept="application/json,.json" hidden></div>
   <div class="box"><h3>${t("acct")}</h3><p style="color:var(--mut);margin:6px 0 0">${t("acctn")}</p></div>
-  <div class="box"><h3>${t("about")}</h3><p style="color:var(--mut);margin:6px 0 0">K_Film 1.0 · TMDB</p></div>`;
+  <div class="box"><h3>${t("about")}</h3><p style="color:var(--mut);margin:6px 0 0">K_Film 1.3 · TMDB</p></div>`;
 }
 const VIEWS={home:vHome,search:vSearch,lib:vLib,favs:vFavs,stats:vStats,settings:vSettings};
 function render(){
@@ -233,14 +243,14 @@ function showWelcome(){
 function openDetail(k){
   const it=S.lib[k];if(!it)return;
   const tv=it.type==="tv";const rem=Math.max(0,(it.eps||0)-(it.ep||0));const pct=it.eps?Math.min(100,(it.ep||0)/it.eps*100):0;
-  $("#layer").innerHTML=`<div class="mod" data-a="mclose"><div class="sheet" data-k="${esc(k)}" onclick="event.stopPropagation()">
+  $("#layer").innerHTML=`<div class="mod" data-a="mclose"><div class="sheet" data-k="${esc(k)}"><div id="dmsg" class="dmsg" role="status"></div>
   <div class="hd">${poster(it)}<div style="flex:1;min-width:0"><h2 style="margin:0 0 4px">${esc(title(it))}</h2>
   <small style="color:var(--mut);display:block">${t("orig")}: ${esc(it.orig)}</small><small style="color:var(--mut)">${esc(it.year||"")} ${it.ctry?.length?"· "+esc(it.ctry.join("، ")):""}</small><div style="margin-top:8px"><button class="fav ${it.fav?"on":""}" data-a="fav" aria-label="favorite">${it.fav?"♥":"♡"}</button></div></div></div>
   <label>${t("status")}</label><select id="dst">${["watching","watched","plan","none"].map(s=>`<option value="${s}" ${it.st===s?"selected":""}>${stLabel(s)}</option>`).join("")}</select>
-  ${tv?`<label>${t("epw")} (${t("total")}: ${it.eps||"?"})</label><div class="sr"><input id="dep" type="number" min="0" ${it.eps?`max="${it.eps}"`:""} value="${it.ep||0}"><button class="btn" data-a="sep">${t("save")}</button></div><div class="bar"><i style="width:${pct}%"></i></div><small style="color:var(--mut)">${it.ep||0} / ${it.eps||"?"} · ${t("rem")}: ${it.eps?rem:"?"}</small>`:""}
-  <label>${t("rating")}</label><div class="sr"><input id="drt" type="number" min="0" max="10" step="0.5" value="${it.rating??""}"><button class="btn" data-a="srt">${t("save")}</button></div>
-  <label>${t("notes")}</label><textarea id="dnt">${esc(it.note)}</textarea><button class="btn" style="margin-top:8px" data-a="snt">${t("save")}</button>
-  <div style="display:flex;gap:10px;margin-top:18px"><button class="btn red" data-a="dele">${t("del")}</button><button class="btn ghost" data-a="mclose">${t("close")}</button></div></div></div>`;
+  ${tv?`<label>${t("epw")} (${t("total")}: ${it.eps||"?"})</label><div class="sr"><input id="dep" type="text" inputmode="numeric" autocomplete="off" value="${it.ep||0}"><button class="btn" data-a="dsave">${t("save")}</button></div><div class="bar"><i style="width:${pct}%"></i></div><small style="color:var(--mut)">${it.ep||0} / ${it.eps||"?"} · ${t("rem")}: ${it.eps?rem:"?"}</small>`:""}
+  <label>${t("rating")}</label><div class="sr"><input id="drt" type="text" inputmode="decimal" autocomplete="off" value="${it.rating??""}"><button class="btn" data-a="dsave">${t("save")}</button></div>
+  <label>${t("notes")}</label><textarea id="dnt">${esc(it.note)}</textarea><button class="btn" style="margin-top:8px" data-a="dsave">${t("save")}</button>
+  <div style="display:flex;gap:10px;margin-top:18px"><button class="btn red" data-a="dele">${t("del")}</button><button class="btn ghost" data-a="mclose">${t("close")}</button></div><div class="ver">v1.3</div></div></div>`;bindSheet(k);
 }
 function upd(k,fn){const it=S.lib[k];if(!it)return;fn(it);it.upd=Date.now();save();render()}
 /* ---------- events ---------- */
@@ -254,11 +264,9 @@ document.addEventListener("click",e=>{
   else if(a==="add")addItem(el.dataset.type,+el.dataset.id);
   else if(a==="f"){libF=el.dataset.s;render()}
   else if(a==="open")openDetail(el.dataset.k);
-  else if(a==="mclose"){$("#layer").innerHTML=""}
-  else if(a==="fav"){upd(k,i=>i.fav=!i.fav);openDetail(k)}
-  else if(a==="sep"){let v=Math.max(0,Math.floor(+$("#dep").value||0));const it=S.lib[k];if(it.eps)v=Math.min(v,it.eps);upd(k,i=>{i.ep=v;if(i.eps&&v>=i.eps)i.st="watched";else if(v>0&&i.st==="plan")i.st="watching"});openDetail(k);toast(t("saved"))}
-  else if(a==="srt"){const raw=$("#drt").value;let v=raw===""?null:Math.min(10,Math.max(0,+raw));upd(k,i=>i.rating=v);openDetail(k);toast(t("saved"))}
-  else if(a==="snt"){const v=$("#dnt").value;upd(k,i=>i.note=v);toast(t("saved"))}
+  else if(a==="mclose"){if(el.classList.contains("mod")&&e.target!==el)return;$("#layer").innerHTML="";render()}
+  else if(a==="fav"){saveDetail(k,"quiet");upd(k,i=>i.fav=!i.fav);openDetail(k)}
+  else if(a==="dsave")doSave(k,0);
   else if(a==="dele"){if(confirm(t("delq"))){delete S.lib[k];save();$("#layer").innerHTML="";render()}}
   else if(a==="sname"){const v=$("#sn").value.trim();if(v){S.name=v;save();toast(t("saved"))}}
   else if(a==="skey"){S.key=$("#sk").value.trim();save();toast(t("saved"))}
@@ -271,9 +279,44 @@ document.addEventListener("change",e=>{
   const id=e.target.id;
   if(id==="sl"){S.lang=e.target.value;save();render()}
   else if(id==="sth"){S.theme=e.target.value;save();render()}
-  else if(id==="dst"){const k=e.target.closest(".sheet").dataset.k;upd(k,i=>i.st=e.target.value);openDetail(k)}
+  else if(id==="dst"){const k=e.target.closest(".sheet").dataset.k;saveDetail(k,"quiet");upd(k,i=>i.st=e.target.value);openDetail(k)}
   else if(id==="imf"&&e.target.files[0])importData(e.target.files[0]);
 });
+function numTxt(v){return String(v??"").trim().replace(/[۰-۹]/g,d=>"۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[٫,،]/g,".")}
+/* mode: "input" = live typing, "quiet" = leaving a field / pressing Save, "full" = Save tapped (verify + message + refresh) */
+function saveDetail(k,mode){
+  const it=S.lib[k];const full=mode==="full";let bad=null;if(!it||!$("#drt")||!$("#dnt")){if(full)msg(t("saveerr"),true);return false}
+  let rating=it.rating;const rs=numTxt($("#drt").value);
+  if(rs==="")rating=null;else{const n=Number(rs);if(!isFinite(n))bad=t("badr");else rating=Math.min(10,Math.max(0,n))}
+  let ep=it.ep||0;const de=$("#dep");
+  if(de&&it.type==="tv"){const es=numTxt(de.value);if(es==="")ep=0;else if(/^\d+$/.test(es)){ep=parseInt(es,10);if(it.eps)ep=Math.min(ep,it.eps)}else bad=bad||t("bade")}
+  if(bad&&full){msg(bad,true);return false}
+  const note=$("#dnt").value;
+  it.rating=rating;it.note=note;if(it.type==="tv")it.ep=ep;
+  if(mode!=="input"&&it.type==="tv"){if(it.eps&&ep>=it.eps)it.st="watched";else if(ep>0&&it.st==="plan")it.st="watching"}
+  it.upd=Date.now();const ok=save();
+  if(!full)return ok;
+  let v=false;try{const c=JSON.parse(localStorage.getItem(KEY)).lib[k];v=!!c&&c.rating===it.rating&&c.note===note&&(it.type!=="tv"||c.ep===ep)}catch(e){}
+  if(!ok||!v){msg(t("saveerr"),true);return false}
+  const sc=$(".sheet").scrollTop;render();openDetail(k);const sh=$(".sheet");if(sh)sh.scrollTop=sc;msg(t("saved"));return true;
+}
+let _mt;
+function msg(m,bad){toast(m,bad);const d=$("#dmsg");if(d){d.textContent=m;d.className="dmsg "+(bad?"bad":"ok");clearTimeout(_mt);_mt=setTimeout(()=>{d.textContent="";d.className="dmsg"},bad?4000:2200)}}
+function flash(idx,ok){const b=document.querySelectorAll(".sheet [data-a=dsave]")[idx];if(!b)return;const o=b.textContent;b.textContent=ok?"✓":"✗";b.style.background=ok?"#2e9e6b":"#c2415d";b.style.color="#fff";setTimeout(()=>{if(b.isConnected){b.textContent=o;b.style.background="";b.style.color=""}},1400)}
+function doSave(k,idx){let ok=false;try{ok=saveDetail(k,"full")}catch(err){msg("Error: "+(err&&err.message||err),true)}flash(idx,ok)}
+/* Save buttons get their own listeners every time the sheet is drawn (tap = click or a touch that did not scroll) */
+function bindSheet(k){document.querySelectorAll(".sheet [data-a=dsave]").forEach((b,idx)=>{b.type="button";let last=0,y0=0;
+  const go=ev=>{ev.preventDefault();ev.stopPropagation();const n=Date.now();if(n-last<400)return;last=n;doSave(k,idx)};
+  b.addEventListener("click",go);
+  b.addEventListener("touchstart",ev=>{y0=ev.touches[0].clientY},{passive:true});
+  b.addEventListener("touchend",ev=>{const dy=Math.abs((ev.changedTouches[0]||{clientY:y0}).clientY-y0);if(dy<10)go(ev)},{passive:false});
+})}
+addEventListener("error",e=>msg("JS error: "+(e.message||"unknown"),true));
+addEventListener("unhandledrejection",e=>msg("Error: "+((e.reason&&e.reason.message)||e.reason),true));
+const DF=["drt","dnt","dep"];
+document.addEventListener("input",e=>{const sh=e.target.closest?.(".sheet");if(sh&&DF.includes(e.target.id))saveDetail(sh.dataset.k,"input")});
+document.addEventListener("focusout",e=>{const sh=e.target.closest?.(".sheet");if(sh&&DF.includes(e.target.id))saveDetail(sh.dataset.k,"quiet")});
+document.addEventListener("pointerdown",e=>{const b=e.target.closest?.("[data-a=dsave]");const sh=b&&b.closest(".sheet");if(sh)saveDetail(sh.dataset.k,"quiet")});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"){if(e.target.id==="q")doSearch(e.target.value);if(e.target.id==="wn")document.querySelector('[data-a=wstart]').click()}});
 /* ---------- backup ---------- */
 function exportData(){
